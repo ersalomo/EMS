@@ -4,11 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -19,17 +21,22 @@ import javax.persistence.Table;
 public class User {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(columnDefinition = "serial")
     private Long id;
 
     @Column(name = "email_addr")
-    private Long email;
+    private String email;
 
+    @NotBlank(message = "required")
     private String password;
 
-    @Column(name = "created_at")
-    private String createdAt;
+    @CreatedDate
+    @Column(name = "created_at", nullable= false, updatable = false)
+    private Date createdAt;
 
+    @LastModifiedDate
     @Column(name = "updated_at")
-    private String updatedAt;
+    private Date updatedAt;
 
 }

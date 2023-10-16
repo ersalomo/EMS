@@ -9,8 +9,6 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class Response <T>{
-
     private T data;
-
     private String errors;
 }

@@ -13,28 +13,23 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "orders")
-public class Order {
-
+@Table(name = "products")
+public class Product {
     @Id
     private Long id;
 
-    @Column(name = "order_time")
-    private String orderTime;
+    @Column(name = "product_name")
+    private String productName;
 
-    @Column(name = "destination_addr")
-    private String destinationAddr;
+    private double price;
 
-    @Column(name = "completed")
-    private boolean isCompleted;
+    @ManyToOne
+    @JoinColumn(name = "merchant_id", referencedColumnName = "id")
+    private Merchant merchant;
 
     @Column(name = "created_at")
     private String createdAt;
 
     @Column(name = "updated_at")
     private String updatedAt;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private User user;
 }
