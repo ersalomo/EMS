@@ -1,10 +1,12 @@
 package com.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -32,10 +34,12 @@ public class User {
     private String password;
 
     @CreatedDate
-    @Column(name = "created_at", nullable= false, updatable = false)
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "Asia/Jakarta")
+    @Column(name = "created_at", nullable= true, updatable = false)
     private Date createdAt;
 
-    @LastModifiedDate
+    @UpdateTimestamp
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "Asia/Jakarta")
     @Column(name = "updated_at")
     private Date updatedAt;
 

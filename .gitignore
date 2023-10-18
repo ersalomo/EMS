@@ -35,3 +35,6 @@ build/
 db.sql
 src/main/resources/*
 src/test/java/*
+logs/*
+.mvn
+src/test/*

@@ -1,12 +1,16 @@
 package com.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -28,8 +32,9 @@ public class Product {
     private Merchant merchant;
 
     @Column(name = "created_at")
-    private String createdAt;
+    private Date createdAt;
 
+    @JsonFormat(timezone = "Asia/Jakarta")
     @Column(name = "updated_at")
-    private String updatedAt;
+    private Date updatedAt;
 }

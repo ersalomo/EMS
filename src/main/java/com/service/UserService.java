@@ -15,21 +15,24 @@ import java.util.List;
 
 @Service
 public class UserService {
+
     @Autowired
     private UserRepository userRepository;
 
 
     @Transactional
-    public void create(UserRequest req){
+    public void create(UserRequest req) {
 
-        if (req.getEmail().isEmpty() || req.getPassword().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "email or password invalid");
+        if (userRepository.existsByEmail(req.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email Already exists :)");
+
         }
         User user = new User();
         user.setEmail(req.getEmail());
         String hashedPwd = BCrypt.hashpw(req.getPassword(), BCrypt.gensalt());
         user.setPassword(hashedPwd);
         userRepository.save(user);
+
     }
 
     public List<User> findAll() {
@@ -38,7 +41,7 @@ public class UserService {
 
     public void delete(Long id) {
         if(!userRepository.existsById(id)){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found :)");
         }
         userRepository.deleteById(id);
     }
