@@ -6,10 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 @Getter
@@ -17,17 +14,25 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "marchants")
+@Table(name = "merchants", uniqueConstraints = @UniqueConstraint(columnNames = "merchant_code", name = "unique_merchant_code"))
 public class Merchant {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(columnDefinition = "serial")
     private Long id;
 
-    @Column(name = "marchant_name")
-    private String marchantName;
+    @Column(name = "merchant_code")
+    private String merchantCode;
 
-    @Column(name = "marchant_location")
-    private String marchantLocation;
+    @Column(name = "merchant_name")
+    private String merchantName;
+
+    @Column(name = "merchant_location")
+    private String merchantLocation;
+
+    @Column(name = "is_open")
+    private boolean isOpen;
 
     @Column(name = "created_at")
     private Date createdAt;

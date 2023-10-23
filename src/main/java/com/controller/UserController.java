@@ -27,6 +27,6 @@ public class UserController {
     @DeleteMapping("/{id}")
     public Response<String> delete(@PathVariable Long id) {
         userService.delete(id);
-        return Response.<String>builder().data("Data berhasil dihapus").build();
+        return Response.<String>builder().data("Data delete").build();
     }
 }

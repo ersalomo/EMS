@@ -63,11 +63,10 @@ public class AuthController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public Response<Map<String, String>> register(@RequestBody UserRequest req) {
+    public Response<Map<String, String>> register(@Valid @RequestBody UserRequest req) {
         violations = validator.validate(req);
         if(!violations.isEmpty()){
             res.put("status", "fail");
-            res.put("message", "email or password are invalid");
             res.put("code", String.valueOf(HttpStatus.BAD_REQUEST));
             violations.forEach(v -> res.put(String.valueOf(v.getPropertyPath()), v.getMessage()));
         return Response.<Map<String, String>>builder().data(res).build();

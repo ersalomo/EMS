@@ -18,11 +18,14 @@ import javax.validation.constraints.Size;
 public class UserRequest {
 
     @Email
-    @Size(min = 6)
+    @Size(min = 8, max = 100)
     private String email;
 
+    @Size(min = 8, max = 100)
+    private String username;
+
     @NotBlank
-    @Size(min = 6)
+    @Size(min = 8, max = 255)
     private String password;
 
 }

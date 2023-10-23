@@ -18,6 +18,8 @@ import java.util.Date;
 public class OrderDetail {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(columnDefinition = "serial")
     private Long id;
 
     @ManyToOne

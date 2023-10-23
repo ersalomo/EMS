@@ -1,17 +1,15 @@
 package com.entity;
 
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import java.util.Date;
 
 @Getter
@@ -19,22 +17,23 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "users")
-public class User {
+@Table(name = "carts")
+public class Cart {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "serial")
     private Long id;
 
-    @Column(name = "email_addr")
-    private String email;
+    @OneToOne
+    @JoinColumn(name = "product_id", columnDefinition = "id")
+    private Product product;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", columnDefinition = "id")
+    private User user;
 
-    private String username;
-
-    @NotBlank(message = "required")
-    private String password;
+    private Long qty;
 
     @CreatedDate
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "Asia/Jakarta")
@@ -45,5 +44,4 @@ public class User {
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "Asia/Jakarta")
     @Column(name = "updated_at")
     private Date updatedAt;
-
 }

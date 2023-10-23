@@ -18,10 +18,12 @@ import java.util.Date;
 public class Order {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(columnDefinition = "serial")
     private Long id;
 
     @Column(name = "order_time")
-    private String orderTime;
+    private Date orderTime;
 
     @Column(name = "destination_addr")
     private String destinationAddr;

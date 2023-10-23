@@ -17,10 +17,15 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "products")
+@Table(name = "products", uniqueConstraints = @UniqueConstraint(columnNames = "product_code", name = "unique_product_code"))
 public class Product {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(columnDefinition = "serial")
     private Long id;
+
+    @Column(name = "product_code")
+    private String productCode;
 
     @Column(name = "product_name")
     private String productName;
