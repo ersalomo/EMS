@@ -2,6 +2,7 @@ package com.controller;
 
 
 import com.model.Response;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -14,11 +15,14 @@ import javax.validation.ConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @RestControllerAdvice
 public class ErrorController {
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Response<String>> constraintViolationException (ConstraintViolationException exception) {
+        String errorMsg = String.format("[Error] : %s", exception.getMessage());
+        log.error(errorMsg);
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(Response.<String>builder()
@@ -30,6 +34,7 @@ public class ErrorController {
 
     @ExceptionHandler
     public ResponseEntity<Response<String>> apiException(ResponseStatusException e) {
+        log.error(e.getMessage());
         return ResponseEntity.status(e.getStatus())
                 .body(Response.<String>builder()
                         .errors("Invalid")
@@ -41,6 +46,7 @@ public class ErrorController {
     public ResponseEntity<?> handleValidation(
             MethodArgumentNotValidException ex
     ) {
+        log.error(ex.getMessage());
         Map<String, Object> res = new HashMap<>();
         Map<String, Object> errors = new HashMap<>();
         res.put("status", "fail");

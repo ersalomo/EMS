@@ -10,10 +10,6 @@ import org.springframework.lang.Nullable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SuccessResponse<T> {
+public class SuccessResponse {
     private String message;
-    private HttpStatus status;
-
-    @Nullable
-    private T data;
 }

@@ -11,8 +11,7 @@ public class EMSApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(EMSApplication.class, args);
+        log.info("Server is running on localhost:8001");
     }
-
-
 
 }

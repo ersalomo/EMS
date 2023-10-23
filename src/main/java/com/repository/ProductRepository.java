@@ -1,16 +1,18 @@
 package com.repository;
 
 import com.entity.Product;
+import com.service.ProductService;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
+    boolean existsById(Long id);
 
-
-//    @Modifying
-//    boolean update(Long id, Product product);
+    Optional<Product> findById(Long id);
 }

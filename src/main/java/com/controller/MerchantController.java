@@ -6,6 +6,7 @@ import com.model.MerchantRequest;
 import com.model.Response;
 import com.model.StatusRequest;
 import com.service.MerchantService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.validation.Valid;
 import java.util.*;
 
+@Slf4j
 @RestController
 @RequestMapping("api/merchants")
 public class MerchantController {
@@ -60,7 +62,7 @@ public class MerchantController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable Long id) {
         Map<String, Object> res = new HashMap<>();
-
+        log.info(String.format("[delete] data from merchant with id %s", id));
         merchantService.delete(id);
         res.put("status",  "fail");
         res.put("message",  "Data Deleted" );

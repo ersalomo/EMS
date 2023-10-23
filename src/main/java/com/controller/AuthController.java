@@ -34,7 +34,6 @@ public class AuthController {
     Map<String, String> res =  new HashMap<>();
 
     @PostMapping("/login")
-//    @Valid
     public Response<Map<String, String>> login( @RequestBody UserRequest req) {
         violations = validator.validate(req);
         if(!violations.isEmpty()){

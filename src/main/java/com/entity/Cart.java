@@ -25,7 +25,7 @@ public class Cart {
     @Column(columnDefinition = "serial")
     private Long id;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "product_id", columnDefinition = "id")
     private Product product;
 

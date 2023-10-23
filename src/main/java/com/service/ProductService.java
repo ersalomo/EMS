@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductService {
@@ -20,6 +21,18 @@ public class ProductService {
 
     @Autowired
     private MerchantService merchantService;
+
+
+    public boolean productExists(Long id) {
+        return productRepository.existsById(id);
+    }
+
+    public Product find(Long id) {
+
+        Optional<Product> product = productRepository.findById(id);
+        return product.orElse(null);
+    }
+
 
     public void create(ProductRequest productReq) {
         boolean existsMerchant = merchantService.exists(productReq.getMerchantId());
