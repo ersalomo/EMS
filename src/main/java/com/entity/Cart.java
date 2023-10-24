@@ -17,7 +17,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "carts")
+@Table(name = "carts", uniqueConstraints = { @UniqueConstraint(columnNames = {  "user_id", "product_id" }, name = "unique_user_product")})
 public class Cart {
 
     @Id
