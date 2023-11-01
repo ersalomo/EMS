@@ -2,17 +2,18 @@ package com.model;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import javax.crypto.Mac;
-import javax.validation.constraints.*;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class ProductRequest {
+public class ProductUpdateReq {
 
     @Size(min = 4, max = 100)
     @JsonProperty("product_name")
@@ -21,8 +22,4 @@ public class ProductRequest {
 
     @DecimalMin(value = "1.0", message = "Price value is required")
     private double price;
-
-    @JsonProperty(value = "merchant_id")
-    @NotNull(message = "merchantId is required")
-    private Long merchantId;
 }

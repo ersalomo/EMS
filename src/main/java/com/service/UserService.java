@@ -18,6 +18,7 @@ import javax.persistence.criteria.Predicate;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -27,6 +28,9 @@ public class UserService {
     private UserRepository userRepository;
 
 
+    public User find(Long id) {
+        return userRepository.findById(id).orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND,"Not found user"));
+    }
     @Transactional
     public void create(UserRequest req) {
 
@@ -44,35 +48,22 @@ public class UserService {
 
     public Page<User> findAll(UserParamReq req) {
         Pageable paging = PageRequest.of(req.getPage(), req.getSize());
-        if (req.getUsername() != null  && req.getEmail() != null) {
-            return userRepository.findByUsernameAndEmail(req.getUsername(), req.getEmail(), paging);
-        }
         if (req.getUsername() != null) {
-            return userRepository.findByUsername(req.getUsername(), paging);
+            String username = "%" + req.getUsername() + "%";
+            if (req.getEmail() != null) {
+                String email = "%" + req.getEmail() + "%";
+                return userRepository.findByUsernameLikeOrEmailLike(username, email, paging);
+            }
+            return userRepository.findByUsernameLike(username, paging);
         }
+
         if (req.getEmail() != null) {
-            return userRepository.findByUsername(req.getEmail(), paging);
+            String email = "%" + req.getEmail() + "%";
+            return userRepository.findAllByEmailLike(email, paging);
         }
+
         return userRepository.findAllUser(paging);
     }
-
-
-//    public Page<User> get(UserParamReq req) {
-//        Pageable paging = PageRequest.of(req.getPage(), req.getSize());
-//        Specification<User> spec = (root ,query, cb) -> {
-//            List<Predicate> predicates = new ArrayList<>();
-//
-//            if(req.getUsername() != null)  {
-//                predicates.add(cb(root.get("username"), req.setUsername()));
-//            }
-//
-//            if (req.getEmail() != null) {
-//                predicates.add(cb(root.get("email"),  req.getEmail()));
-//            }
-//            return cb.and(predicates.toArray(new Predicate[0]));
-//        };
-//        return userRepository.findAll(spec);
-//    }
 
     public void delete(Long id) {
         if(!userRepository.existsById(id)){

@@ -1,6 +1,7 @@
 package com.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -30,7 +32,6 @@ public class User {
     @Column(name = "email_addr")
     private String email;
 
-
     private String username;
 
     @NotBlank(message = "required")
@@ -45,5 +46,11 @@ public class User {
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "Asia/Jakarta")
     @Column(name = "updated_at")
     private Date updatedAt;
+
+
+
+//    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "carts")
+//    @JoinColumn(name = "user_id")
+//    private List<Cart> cart;
 
 }

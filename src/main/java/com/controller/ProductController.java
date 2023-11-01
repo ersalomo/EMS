@@ -2,7 +2,9 @@ package com.controller;
 
 
 import com.model.ProductRequest;
+import com.model.ProductUpdateReq;
 import com.model.Response;
+import com.response.SuccessResponse;
 import com.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,4 +37,19 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
+    @PatchMapping("{id}")
+    public ResponseEntity<SuccessResponse> updateProduct(
+            @PathVariable Long id,
+            @RequestBody ProductUpdateReq req
+            ) {
+        productService.update(id, req);
+        return ResponseEntity.ok(SuccessResponse.builder().message("Product updated").build());
+    }
+
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<SuccessResponse> deleteProduct(@PathVariable Long id) {
+        productService.delete(id);
+        return ResponseEntity.ok(SuccessResponse.builder().message("Product deleted").build());
+    }
 }

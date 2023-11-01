@@ -2,7 +2,7 @@ package com.response;
 
 import java.util.Map;
 
-public class ErrorResponse {
+public class ErrorResponse extends RuntimeException {
     private Map<String, String> errors;
     private String status;
 

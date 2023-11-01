@@ -11,8 +11,6 @@ import javax.validation.constraints.*;
 @Data
 public class StatusRequest {
 
-@NotBlank
-@AssertFalse
-@AssertTrue
-    private boolean status;
+@NotNull
+    private String status;
 }

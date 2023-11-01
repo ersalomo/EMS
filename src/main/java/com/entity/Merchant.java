@@ -1,6 +1,7 @@
 package com.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -39,4 +41,8 @@ public class Merchant {
 
     @Column(name = "updated_at")
     private Date updatedAt;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "merchant",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Product> products;
 }

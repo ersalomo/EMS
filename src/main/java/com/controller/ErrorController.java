@@ -19,6 +19,11 @@ import java.util.Map;
 @RestControllerAdvice
 public class ErrorController {
 
+//    @ExceptionHandler(ResourceNot)
+//    public ResponseEntity<?> resourceNotFound() {
+//        return ResponseEntity<>("", )
+//    }
+
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Response<String>> constraintViolationException (ConstraintViolationException exception) {
         String errorMsg = String.format("[Error] : %s", exception.getMessage());
@@ -26,18 +31,19 @@ public class ErrorController {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(Response.<String>builder()
-                        .errors("Invalid")
+                        .errors("Invalid contraint")
                         .build());
 
 
     }
 
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<Response<String>> apiException(ResponseStatusException e) {
         log.error(e.getMessage());
         return ResponseEntity.status(e.getStatus())
                 .body(Response.<String>builder()
-                        .errors("Invalid")
+                        .errors(e.getReason())
                         .build());
 
     }

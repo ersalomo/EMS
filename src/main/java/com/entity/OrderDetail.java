@@ -18,14 +18,13 @@ import java.util.Date;
 public class OrderDetail {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(columnDefinition = "serial")
+    @Column(name = "order_id")
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "order_id", referencedColumnName = "id")
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @MapsId
+    @JoinColumn(name = "order_id")
     private Order order;
-
 
     @ManyToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id")
