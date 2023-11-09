@@ -2,10 +2,12 @@ package com.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.util.DefaultAttrEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -16,13 +18,8 @@ import java.util.Date;
 @NoArgsConstructor
 @Entity
 @Table(name = "orders")
-public class Order {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(columnDefinition = "serial")
-    private Long id;
-
+@Where(clause = "deleted_at IS NULL")
+public class Order extends DefaultAttrEntity {
     @Column(name = "order_time")
     private Date orderTime;
 
@@ -32,18 +29,16 @@ public class Order {
     @Column(name = "completed")
     private boolean isCompleted;
 
-    @Column(name = "created_at")
-    private Date createdAt;
-
-    @Column(name = "updated_at")
-    private Date updatedAt;
-
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @JsonIgnore
+
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @PrimaryKeyJoinColumn
+    /*
+    * jika tidak dikomen maka akan error karena terjadi pemanggilan terusng menerus
+    * @JsonIgnore
+    * */
     private OrderDetail orderDetail;
 }

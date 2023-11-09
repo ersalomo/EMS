@@ -4,9 +4,10 @@ package com.controller;
 import com.dao.MerchantParamReq;
 import com.entity.Merchant;
 import com.model.MerchantRequest;
-import com.model.Response;
 import com.model.StatusRequest;
+import com.response.SuccessResponse;
 import com.service.MerchantService;
+import com.service.ValidatorService;
 import com.util.Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,44 +17,52 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.*;
 
 @Slf4j
 @RestController
-@RequestMapping("api/merchants")
+@RequestMapping("/merchants")
 public class MerchantController {
 
     @Autowired
     private MerchantService merchantService;
 
+    @Autowired
+    private ValidatorService validator;
+
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> store(@Valid @RequestBody MerchantRequest req) {
-        merchantService.add(req);
-        return ResponseEntity.ok("Merchant added");
+    public ResponseEntity<SuccessResponse<Merchant>> store(@RequestBody MerchantRequest req) {
+        validator.validate(req);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                SuccessResponse.<Merchant>builder()
+                        .message("Merchant data created")
+                        .statusCode(HttpStatus.CREATED)
+                        .data(merchantService.add(req))
+                        .build()
+        );
     }
-    @PutMapping(
-            value = "/{id}",
-            consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, String>> updateStatusOpen(
-            @PathVariable Long id,
-            @Valid @RequestBody StatusRequest status) {
-        log.info("Status " + status.getStatus()  + " pusing " );
-        merchantService.updateStatus(id, Util.trueOrFalse(status.getStatus()));
-        Map<String, String> res = new HashMap<>();
-        res.put("status",  "success");
-        res.put("message",  "Merchant status updated successfully");
-        return ResponseEntity.ok(res);
+    @PutMapping(value = "/{id}",consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<SuccessResponse<Merchant>> updateStatusOpen(@PathVariable Long id, @Valid @RequestBody StatusRequest status) {
+        log.info("Status {}", status.getStatus());
+        Merchant merchant = merchantService.updateStatus(id, Util.trueOrFalse(status.getStatus()));
+        return ResponseEntity.status(HttpStatus.OK).body(
+                SuccessResponse.<Merchant>builder()
+                        .statusCode(HttpStatus.OK)
+                        .message("Merchant status updated successfully")
+                        .data(merchant)
+                        .build()
+        );
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<?> show(@PathVariable Long id) {
-
-        return ResponseEntity.ok(merchantService.findById(id));
+    public ResponseEntity<SuccessResponse<Merchant>> show(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(
+                SuccessResponse.<Merchant>builder()
+                        .data(merchantService.findById(id))
+                        .build()
+        );
     }
 
 
@@ -95,20 +104,18 @@ public class MerchantController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable Long id) {
-        Map<String, Object> res = new HashMap<>();
-        log.info(String.format("[delete] data from merchant with id %s", id));
+    public ResponseEntity<SuccessResponse<String>> delete(@PathVariable Long id) {
         merchantService.delete(id);
-        res.put("status",  "fail");
-        res.put("message",  "Data Deleted" );
-        return ResponseEntity.ok("");
+        return ResponseEntity.status(HttpStatus.OK).body(
+                SuccessResponse.<String>builder()
+                        .message("Merchant deleted")
+                        .build()
+        );
     }
 
 
     @GetMapping("/report")
-    public ResponseEntity<?> getReport(
-
-    ) {
+    public ResponseEntity<?> getReport() {
         merchantService.generateReportingMerchant();
         return ResponseEntity.ok("This your report");
     }

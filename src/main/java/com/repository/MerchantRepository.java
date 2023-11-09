@@ -11,8 +11,6 @@ import org.springframework.stereotype.Repository;
 public interface MerchantRepository extends JpaRepository<Merchant, Long> {
     @Modifying
     @Query("UPDATE Merchant m SET m.isOpen = :status WHERE m.id = :id")
-    void updateStatus(@Param("id") Long id, @Param("status") boolean status);
-
-
+    Merchant updateStatus(@Param("id") Long id, @Param("status") boolean status);
 
 }

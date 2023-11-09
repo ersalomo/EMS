@@ -29,6 +29,7 @@ public class OrderRequest {
 
     @Min(1)
     @Max(10)
+//    @Size(min = 1, max=10)
     @JsonProperty("qty")
     @NotNull(message = "qty is required")
     private int qty;

@@ -2,10 +2,12 @@ package com.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.util.DefaultAttrEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -17,12 +19,9 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "merchants", uniqueConstraints = @UniqueConstraint(columnNames = "merchant_code", name = "unique_merchant_code"))
-public class Merchant {
+@Where(clause = "deleted_at IS NULL")
+public class Merchant extends DefaultAttrEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(columnDefinition = "serial")
-    private Long id;
 
     @Column(name = "merchant_code")
     private String merchantCode;
@@ -36,13 +35,8 @@ public class Merchant {
     @Column(name = "is_open")
     private boolean isOpen;
 
-    @Column(name = "created_at")
-    private Date createdAt;
-
-    @Column(name = "updated_at")
-    private Date updatedAt;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "merchant",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "merchant",cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Product> products;
 }

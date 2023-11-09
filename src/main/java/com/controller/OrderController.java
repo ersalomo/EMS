@@ -7,14 +7,16 @@ import com.entity.User;
 import com.response.SuccessResponse;
 import com.service.InvoiceService;
 import com.service.OrderService;
+import com.service.ValidatorService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("api/orders")
+@RequestMapping("/orders")
 public class OrderController {
 
     @Autowired
@@ -23,19 +25,26 @@ public class OrderController {
     @Autowired
     private InvoiceService invoiceService;
 
+    @Autowired
+    private ValidatorService validator;
+
 
     @PostMapping(
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<?> create(
-           @Valid @RequestBody OrderRequest request
+    public ResponseEntity<SuccessResponse<Order>> create(
+           @RequestBody OrderRequest request
     ) {
+        validator.validate(request);
         Order order = orderService.addNewOrder(request);
-        User user = order.getUser();
-        user.setPassword(null);
-        order.setUser(user);
-        return ResponseEntity.ok(SuccessResponse.builder().message("Order placed").data(order).build());
+        order.getUser().setPassword(null);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                SuccessResponse.<Order>builder()
+                        .message("Order placed")
+                        .data(order)
+                        .build()
+        );
     }
 
 
@@ -52,8 +61,12 @@ public class OrderController {
 
 
     @PostMapping("/order-invoice")
-    public ResponseEntity<?> getInvoice() {
+    public ResponseEntity<SuccessResponse<String>> getInvoice() {
         invoiceService.generateInvoice();
-        return ResponseEntity.ok("Wow");
+        return ResponseEntity.status(HttpStatus.OK).body(
+                SuccessResponse.<String>builder()
+                        .message("Order")
+                        .build()
+        );
     }
 }

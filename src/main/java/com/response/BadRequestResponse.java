@@ -1,5 +1,6 @@
 package com.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,19 +8,22 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 
+import java.util.Map;
+
 
 @Builder
-@Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class NotFoundResponse {
+@AllArgsConstructor
+@Data
+public class BadRequestResponse {
     @Builder.Default
     private String status = "fail";
 
     @JsonProperty
-    private String message;
+    @Builder.Default
+    private int code = HttpStatus.BAD_REQUEST.value();
 
     @JsonProperty
-    @Builder.Default
-    private int statusCode = HttpStatus.NOT_FOUND.value();
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Map<String,String> errors;
 }

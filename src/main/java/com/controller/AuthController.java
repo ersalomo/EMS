@@ -1,13 +1,17 @@
 package com.controller;
 
 
-import com.model.Response;
+import com.entity.User;
+import com.response.Response;
 import com.model.UserRequest;
+import com.response.SuccessResponse;
 import com.service.AuthService;
 import com.service.UserService;
+import com.service.ValidatorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 public class AuthController {
 
     @Autowired
@@ -28,33 +32,25 @@ public class AuthController {
     @Autowired
     private UserService userService;
 
-    ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-    Validator validator = factory.getValidator();
-    Set<ConstraintViolation<UserRequest>> violations;
-    Map<String, String> res =  new HashMap<>();
+    @Autowired
+    private ValidatorService validator;
 
-    @PostMapping("/login")
-    public Response<Map<String, String>> login( @RequestBody UserRequest req) {
-        violations = validator.validate(req);
-        if(!violations.isEmpty()){
-            res.put("status", "fail");
-            res.put("message", "email or password are invalid");
-            res.put("code", String.valueOf(HttpStatus.BAD_REQUEST));
-            violations.forEach(v -> res.put(String.valueOf(v.getPropertyPath()), v.getMessage()));
-            return Response.<Map<String, String>>builder().data(res).build();
-        }
+    @PostMapping("/login")// token btw
+    public ResponseEntity<SuccessResponse<String>> login(@RequestBody UserRequest req) {
+        validator.validate(req);
         boolean isExists = authService.auth(req);
         if (!isExists){
-            res.put("status", "fail");
-            res.put("message", "email or password doesnt match to our records");
-            res.put("code", String.valueOf(HttpStatus.NOT_FOUND));
-            return Response.<Map<String, String>>builder().data(res).build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    SuccessResponse.<String>builder()
+                            .status("fail")
+                            .statusCode(HttpStatus.UNAUTHORIZED)
+                            .message("Your data doesn't match in our records").build()
+            );
         }
-        res.put("status", "success");
-        res.put("message", "login success");
-        res.put("code", String.valueOf(HttpStatus.OK));
-
-        return Response.<Map<String, String>>builder().data(res).build();
+        return ResponseEntity.status(HttpStatus.OK).body(
+                SuccessResponse.<String>builder()
+                        .message("Login success").build()
+        );
     }
 
     @PostMapping(
@@ -62,20 +58,13 @@ public class AuthController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public Response<Map<String, String>> register(@Valid @RequestBody UserRequest req) {
-        violations = validator.validate(req);
-        if(!violations.isEmpty()){
-            res.put("status", "fail");
-            res.put("code", String.valueOf(HttpStatus.BAD_REQUEST));
-            violations.forEach(v -> res.put(String.valueOf(v.getPropertyPath()), v.getMessage()));
-        return Response.<Map<String, String>>builder().data(res).build();
-        }
-
-        userService.create(req);
-        res.put("status", "success");
-        res.put("message", "register success");
-        res.put("code", String.valueOf(HttpStatus.OK));
-        return Response.<Map<String, String>>builder().data(res).build();
+    public ResponseEntity<SuccessResponse<User>> register(@RequestBody UserRequest req) {
+        validator.validate(req);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                SuccessResponse.<User>builder()
+                        .data(userService.create(req))
+                        .message("Login success").build()
+        );
     }
 
 }

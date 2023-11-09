@@ -2,11 +2,13 @@ package com.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.util.DefaultAttrEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.Where;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
@@ -18,30 +20,16 @@ import java.util.Date;
 @NoArgsConstructor
 @Entity
 @Table(name = "carts", uniqueConstraints = { @UniqueConstraint(columnNames = {  "user_id", "product_id" }, name = "unique_user_product")})
-public class Cart {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(columnDefinition = "serial")
-    private Long id;
+@Where(clause = "deleted_at IS NULL")
+public class Cart extends DefaultAttrEntity {
 
     @ManyToOne
-    @JoinColumn(name = "product_id", columnDefinition = "id")
+    @JoinColumn(name = "product_id", referencedColumnName = "id")
     private Product product;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", columnDefinition = "id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    private Long qty;
-
-    @CreatedDate
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "Asia/Jakarta")
-    @Column(name = "created_at")
-    private Date createdAt;
-
-    @UpdateTimestamp
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "Asia/Jakarta")
-    @Column(name = "updated_at")
-    private Date updatedAt;
+    private Integer qty;
 }

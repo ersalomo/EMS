@@ -3,17 +3,17 @@ package com.controller;
 
 import com.dao.UserParamReq;
 import com.entity.User;
-import com.model.Response;
+import com.response.Response;
+import com.response.SuccessResponse;
 import com.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import java.util.List;
-
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/users")
 public class UserController {
 
     @Autowired
@@ -42,8 +42,10 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public Response<String> delete(@PathVariable Long id) {
+    public ResponseEntity<SuccessResponse<String>> delete(@PathVariable Long id) {
         userService.delete(id);
-        return Response.<String>builder().data("Data delete").build();
+        return ResponseEntity.status(HttpStatus.OK).body(
+                SuccessResponse.<String>builder().message("User delete").build()
+        );
     }
 }

@@ -6,18 +6,21 @@ import lombok.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
 
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@Data
 public class SuccessResponse<T> {
-    private String message;
     @Builder.Default
     private String status = "success";
-    @Builder.Default
-    private HttpStatus code = HttpStatus.OK;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String message;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private HttpStatus statusCode;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private T data;
 
 }

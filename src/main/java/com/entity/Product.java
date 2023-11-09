@@ -4,6 +4,7 @@ package com.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.util.DefaultAttrEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,11 +25,8 @@ import java.util.List;
 @Table(name = "products", uniqueConstraints = @UniqueConstraint(columnNames = "product_code", name = "unique_product_code"))
 @Where(clause = "deleted_at IS null")
 @EnableJpaAuditing
-public class Product {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(columnDefinition = "serial")
-    private Long id;
+public class Product extends DefaultAttrEntity {
+
 
     @Column(name = "product_code")
     private String productCode;
@@ -38,23 +36,10 @@ public class Product {
 
     private double price;
 
-    @ManyToOne
+    @JsonIgnore
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "merchant_id", referencedColumnName = "id")
     private Merchant merchant;
 
-    @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    @org.hibernate.annotations.Generated(value= GenerationTime.INSERT)
-
-    private Date createdAt;
-
-    @JsonFormat(timezone = "Asia/Jakarta")
-    @Column(name = "updated_at")
-    private Date updatedAt;
-
-    @JsonFormat(timezone = "Asia/Jakarta")
-    @Column(name = "deleted_at")
-    @JsonIgnore
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private Date deletedAt;
 
 }

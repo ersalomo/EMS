@@ -17,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.persistence.criteria.Predicate;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,10 +30,10 @@ public class UserService {
 
 
     public User find(Long id) {
-        return userRepository.findById(id).orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND,"Not found user"));
+        return userRepository.findById(id).orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND,"User not found"));
     }
     @Transactional
-    public void create(UserRequest req) {
+    public User create(UserRequest req) {
 
         if (userRepository.existsByEmail(req.getEmail())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email Already exists :)");
@@ -42,7 +43,7 @@ public class UserService {
         user.setEmail(req.getEmail());
         String hashedPwd = BCrypt.hashpw(req.getPassword(), BCrypt.gensalt());
         user.setPassword(hashedPwd);
-        userRepository.save(user);
+        return userRepository.save(user);
 
     }
 
@@ -66,9 +67,8 @@ public class UserService {
     }
 
     public void delete(Long id) {
-        if(!userRepository.existsById(id)){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found :)");
-        }
-        userRepository.deleteById(id);
+        User user = this.find(id);
+        user.setDeletedAt(new Date());
+        userRepository.save(user);
     }
 }

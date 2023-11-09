@@ -30,25 +30,28 @@ public class MerchantService {
     @Autowired
     private MerchantRepository merchantRepository;
 
-
     @PersistenceContext
     private EntityManager em;
 
-    public void add(MerchantRequest merchantDao) {
+    public Merchant findById(Long id) {
+        return merchantRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Merchant Not Found")
+        );
+    }
+
+    public Merchant add(MerchantRequest merchantDao) {
         Merchant merchant = new Merchant();
         merchant.setMerchantCode(GenerateUniqueCode.generateUniqueCode());
         merchant.setMerchantName(merchantDao.getMerchantName());
         merchant.setMerchantLocation(merchantDao.getMerchantLocation());
-        merchantRepository.save(merchant);
+        return merchantRepository.save(merchant);
     }
 
     @Transactional
-    public void updateStatus(Long id, boolean status) {
-         Optional<Merchant> merchant = merchantRepository.findById(id);
-        if (!merchant.isPresent()){
-         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Merchant not found");
-        }
-        merchantRepository.updateStatus(id, status);
+    public Merchant updateStatus(Long id, boolean status) {
+         Merchant merchant = findById(id);
+         merchant.setOpen(status);
+         return merchantRepository.save(merchant);
     }
 
     public Page<Merchant> findAll(Pageable pageable) {
@@ -113,17 +116,11 @@ public class MerchantService {
        return merchantRepository.existsById(id);
     }
     public void delete(Long id) {
-        merchantRepository.deleteById(id);
+        Merchant merchant = findById(id);
+        merchantRepository.save(merchant);
     }
 
-    public Merchant findById(Long id) {
-        Optional<Merchant> merchant = merchantRepository.findById(id);
 
-        if (!merchant.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Merchant Not Found");
-        }
-        return merchant.get();
-    }
 
     public void generateReportingMerchant() {
 

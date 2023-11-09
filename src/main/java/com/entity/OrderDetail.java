@@ -1,10 +1,13 @@
 package com.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.util.DefaultAttrEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -15,18 +18,26 @@ import java.util.Date;
 @NoArgsConstructor
 @Entity
 @Table(name = "order_detail")
-public class OrderDetail {
+@Where(clause = "deleted_at IS NULL")
+@AttributeOverride(name = "id", column = @Column(name = "order_id" ))
+public class OrderDetail extends DefaultAttrEntity {
 
     @Id
-    @Column(name = "order_id")
     private Long id;
 
+
+    /*
+     * maka akan error karena terjadi pemanggilan terusng menerus
+     *
+     * */
+    @JsonIgnore
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @MapsId
     @JoinColumn(name = "order_id")
     private Order order;
 
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     private Product product;
 
@@ -35,10 +46,5 @@ public class OrderDetail {
     @Column(name = "total_price")
     private double totalPrice;
 
-    @Column(name = "created_at")
-    private Date createdAt;
-
-    @Column(name = "updated_at")
-    private Date updatedAt;
 
 }
