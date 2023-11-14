@@ -1,5 +1,6 @@
 package com.service;
 
+import com.controller.MerchantController;
 import com.dao.MerchantParamReq;
 import com.entity.Merchant;
 import com.model.MerchantRequest;
@@ -10,18 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.*;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -29,9 +26,6 @@ public class MerchantService {
 
     @Autowired
     private MerchantRepository merchantRepository;
-
-    @PersistenceContext
-    private EntityManager em;
 
     public Merchant findById(Long id) {
         return merchantRepository.findById(id).orElseThrow(
@@ -53,63 +47,26 @@ public class MerchantService {
          merchant.setOpen(status);
          return merchantRepository.save(merchant);
     }
-
-    public Page<Merchant> findAll(Pageable pageable) {
-        return merchantRepository.findAll(pageable);
-    }
-    public List<Merchant> findAll(MerchantParamReq req) {
-
-        int page = Math.max(req.getPage(), 1);
+    public Page<Merchant> findAll(MerchantParamReq req) {
+        int page = Math.max(req.getPage(), 0);
         int size = req.getSize();
-        int offset = (page - 1) * size;
-        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-        CriteriaQuery<Merchant> criteriaQuery = criteriaBuilder.createQuery(Merchant.class);
-        Root<Merchant> root = criteriaQuery.from(Merchant.class);
-        criteriaQuery.select(root);
-
-        List<Predicate> andPredicates = new ArrayList<>();
-        List<Predicate> orPredicates = new ArrayList<>();
-
-        if (req.getName() != null) {
-            Expression<String> nameExpression = criteriaBuilder.lower(root.get("merchantName"));
-            orPredicates.add(criteriaBuilder.like(nameExpression, "%" + req.getName().toLowerCase() + "%"));
-        }
-
-        if (req.getLocation() != null) {
-            Expression<String> locationExpression = criteriaBuilder.lower(root.get("merchantLocation"));
-            orPredicates.add(criteriaBuilder.like(locationExpression, "%" + req.getLocation().toLowerCase() + "%"));
-        }
-
-        if (req.getOpen() == 1 || req.getOpen() == 0) {
-            boolean isOpen = req.getOpen() == 1;
-            andPredicates.add(criteriaBuilder.equal(root.get("isOpen"), isOpen));
-        }
-
-
-        Predicate andPredicate = criteriaBuilder.and(andPredicates.toArray(new Predicate[0]));
-        Predicate orPredicate = criteriaBuilder.or(orPredicates.toArray(new Predicate[0]));
-        Predicate finalPredicate = criteriaBuilder.and(andPredicate, orPredicate);
-
-        criteriaQuery.where(finalPredicate);
-        log.info("Query" + " criteriaQuery " + criteriaQuery.toString() + " finalPredicate " + finalPredicate.toString() );
-        TypedQuery<Merchant> query = em.createQuery(criteriaQuery);
-        query.setFirstResult(offset);
-        query.setMaxResults(size);
-        return query.getResultList();
-    }
-    public List<Merchant> findAllBy(MerchantParamReq req) {
-        int size = req.getSize();
-        int offset = (req.getPage() - 1) * size;
-        String queryString = "SELECT m FROM Merchant m";
-        if (req.getName() != null || req.getLocation() != null || req.getOpen() == 1) {
-            queryString += "WHERE m.merchantCode LIKE %?1% OR m.merchantLocation LIKE %?2%";
-        }
-
-        TypedQuery<Merchant> query = em.createQuery(queryString, Merchant.class);
-        query.setFirstResult(offset);
-        query.setMaxResults(size);
-
-        return query.getResultList();
+        Pageable pageable = PageRequest.of(page, size);
+        Specification<Merchant> specification = (root, criteria, builder) ->
+                criteria.where(
+                        builder.and(
+                                StringUtils.isNotEmpty(req.getName()) ?
+                                builder.like(builder.lower(root.get("merchantName")), "%"+ req.getName().toLowerCase() + "%") : builder.and(),
+                                StringUtils.isNotEmpty(req.getLocation()) ?
+                                builder.like(builder.lower(root.get("merchantLocation")), "%"+ req.getLocation().toLowerCase() + "%") : builder.and()
+                        ),
+                        StringUtils.isNotEmpty(req.getOpen()) ?
+                        builder.and(
+                                builder.and(builder.equal(root.get("isOpen"), Objects.equals(req.getOpen(), MerchantController.OpenStatus.TRUE.toString())))
+                        ) : builder.and()
+          ).getRestriction();
+        Page<Merchant> merchants = merchantRepository.findAll(specification,pageable);
+        log.info("merchant [] {} {}", pageable);
+        return merchants;
     }
 
     public boolean exists(Long id) {
@@ -117,12 +74,9 @@ public class MerchantService {
     }
     public void delete(Long id) {
         Merchant merchant = findById(id);
+        merchant.setDeletedAt(new Date());
         merchantRepository.save(merchant);
     }
 
 
-
-    public void generateReportingMerchant() {
-
-    }
 }

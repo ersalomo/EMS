@@ -4,16 +4,28 @@ package com.controller;
 import com.dao.OrderRequest;
 import com.entity.Order;
 import com.entity.User;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.response.SuccessResponse;
 import com.service.InvoiceService;
 import com.service.OrderService;
 import com.service.ValidatorService;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
+import org.aspectj.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import java.io.File;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/orders")
@@ -60,13 +72,16 @@ public class OrderController {
     }
 
 
-    @PostMapping("/order-invoice")
-    public ResponseEntity<SuccessResponse<String>> getInvoice() {
-        invoiceService.generateInvoice();
-        return ResponseEntity.status(HttpStatus.OK).body(
-                SuccessResponse.<String>builder()
-                        .message("Order")
-                        .build()
-        );
+    @PostMapping("/get-invoice")
+    public ResponseEntity<byte[]> getInvoice(
+            @Valid @RequestParam @NotNull(message = "current user is required") Long userId ) throws IOException {
+        String invFileName = invoiceService.generateInvoice(userId);
+        File file  = new File(invFileName);
+        byte[] fileContent = FileCopyUtils.copyToByteArray(file);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("filename", invFileName);
+        headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+        return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
     }
 }

@@ -1,6 +1,7 @@
 package com.service;
 
 
+import com.dao.ProductParamReq;
 import com.entity.Merchant;
 import com.entity.Product;
 import com.model.ProductRequest;
@@ -9,7 +10,12 @@ import com.repository.ProductRepository;
 import com.util.GenerateUniqueCode;
 import com.util.Util;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -61,8 +67,17 @@ public class ProductService {
         productRepository.save(product);
     }
 
-    public List<Product> get() {
-     return productRepository.findAll();
+    public Page<Product> get(ProductParamReq req) {
+        Pageable pageable = PageRequest.of(req.getPage(), req.getSize());
+        Specification<Product> specification = ((root, query, builder) ->
+                query.where(
+                        builder.and(
+                                StringUtils.isNotEmpty(req.getName()) ?
+                                        builder.like(
+                                                builder.lower(root.get("productName")), "%" +req.getName().toLowerCase()+ "%"
+                                        ) : builder.and()
+                        )).getRestriction());
+     return productRepository.findAll(specification, pageable);
     }
     public Product update(Long id, ProductUpdateReq req) {
         Product product = find(id);

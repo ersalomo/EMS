@@ -19,13 +19,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Null;
+import javax.validation.constraints.Pattern;
 import java.util.*;
 
 @Slf4j
 @RestController
 @RequestMapping("/merchants")
 public class MerchantController {
-
+    public enum OpenStatus {
+        ALL, TRUE, FALSE
+    }
     @Autowired
     private MerchantService merchantService;
 
@@ -67,39 +71,29 @@ public class MerchantController {
 
 
     @GetMapping
-    public ResponseEntity<Map<String,?>> findAll(
+    public ResponseEntity<SuccessResponse<Page<Merchant>>> findAll(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String location,
-            @RequestParam(required = false, defaultValue = "3" ) int open,
+            @RequestParam(required = false) OpenStatus open,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
         MerchantParamReq req = new MerchantParamReq();
         req.setName(name);
         req.setLocation(location);
-        req.setOpen(open);
-        req.setSize(size);
         req.setPage(page);
-        Map<String, Object> res = new HashMap<>();
-        List<Merchant> merchants;
-        log.info(req + " Here " + open);
-        if (open == 3 && location == null && name == null) {
-            Page<Merchant> merchantPage = merchantService.findAll(PageRequest.of(page, size));
-            merchants = merchantPage.getContent();
-        }else{
-            merchants  = merchantService.findAll(req);
+        req.setSize(size);
+        //set is open
+        if (open == OpenStatus.TRUE || OpenStatus.FALSE == open) {
+            req.setOpen(open.toString());
         }
-
-        if (merchants.isEmpty()) {
-            res.put("status",  "fail");
-            res.put("message",  "Not Found" );
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
-        }
-
-        res.put("status", "success");
-        res.put("data", merchants);
-
-        return ResponseEntity.status(HttpStatus.OK).body(res);
+        log.info("[Open] {}", req.getOpen());
+        Page<Merchant> merchants = merchantService.findAll(req);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                SuccessResponse.<Page<Merchant>>builder()
+                        .data(merchants)
+                        .build()
+        );
 
     }
 
@@ -111,12 +105,5 @@ public class MerchantController {
                         .message("Merchant deleted")
                         .build()
         );
-    }
-
-
-    @GetMapping("/report")
-    public ResponseEntity<?> getReport() {
-        merchantService.generateReportingMerchant();
-        return ResponseEntity.ok("This your report");
     }
 }

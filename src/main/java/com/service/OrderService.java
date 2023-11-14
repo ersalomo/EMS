@@ -7,12 +7,14 @@ import com.entity.Product;
 import com.entity.User;
 import com.repository.OrderRepository;
 import com.util.Util;
+import org.apache.catalina.LifecycleState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 public class OrderService {
@@ -61,5 +63,10 @@ private OrderDetailService orderDetailService;
 
     public Order findDetailOrder(Long id) {
         return orderRepository.findOrderWithUserAndOrderDetail(id);
+    }
+
+
+    public List<Order> getAllOrderByUserId(Long userId) {
+        return orderRepository.findAllByUser_Id(userId);
     }
 }

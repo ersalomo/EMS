@@ -1,6 +1,7 @@
 package com.controller;
 
 
+import com.dao.ProductParamReq;
 import com.entity.Product;
 import com.model.ProductRequest;
 import com.model.ProductUpdateReq;
@@ -8,6 +9,7 @@ import com.response.SuccessResponse;
 import com.service.ProductService;
 import com.service.ValidatorService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,10 +44,18 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<SuccessResponse<List<Product>>> findAll() {
+    public ResponseEntity<SuccessResponse<Page<Product>>> findAll(
+            @RequestParam(required = false) String productName,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        ProductParamReq req = new ProductParamReq();
+        req.setSize(size);
+        req.setPage(page);
+        req.setName(productName);
         return ResponseEntity.status(HttpStatus.OK).body(
-                SuccessResponse.<List<Product>>builder()
-                        .data(productService.get())
+                SuccessResponse.<Page<Product>>builder()
+                        .data(productService.get(req))
                         .build()
         );
     }

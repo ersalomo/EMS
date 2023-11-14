@@ -2,6 +2,8 @@ package com.util;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Getter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -20,7 +22,7 @@ import java.util.Date;
         value = {"created_at", "deleted_at"},
         allowGetters = true
 )
-
+@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public abstract class DefaultAttrEntity implements Serializable {
 
     @Getter

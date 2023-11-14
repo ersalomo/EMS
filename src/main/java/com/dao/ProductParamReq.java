@@ -2,14 +2,14 @@ package com.dao;
 
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class ParamReqPagination {
-    private int page;
-    private int size;
+public class ProductParamReq extends ParamReqPagination {
+    private String name;
 }

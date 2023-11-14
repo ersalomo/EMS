@@ -1,6 +1,8 @@
 package com.controller;
 
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.response.BadRequestResponse;
 import com.response.NotFoundResponse;
 import com.response.Response;
@@ -13,9 +15,13 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.validation.ConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 @RestControllerAdvice
+//@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
+
 public class ErrorController {
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -23,7 +29,7 @@ public class ErrorController {
         log.error("[Error] {} ", e.getMessage());
         Map<String, String> errors = new HashMap<>();
         e.getConstraintViolations().forEach(
-                err -> errors.put(err.getPropertyPath().toString(), err.getMessage())
+                err -> errors.put(toSnakeCase(err.getPropertyPath().toString()), err.getMessage())
         );
 
         return ResponseEntity
@@ -45,6 +51,18 @@ public class ErrorController {
                                 ).build()
                 );
 
+    }
+
+    private static String toSnakeCase(String camelCase) {
+        Pattern pattern = Pattern.compile("(?<=[a-z])[A-Z]");
+        Matcher matcher = pattern.matcher(camelCase);
+
+        StringBuffer stringBuffer = new StringBuffer();
+        while (matcher.find()){
+            matcher.appendReplacement(stringBuffer, "_" + matcher.group().toLowerCase());
+        }
+        matcher.appendTail(stringBuffer);
+        return stringBuffer.toString().toLowerCase();
     }
 //    @ResponseStatus(HttpStatus.BAD_REQUEST)
 //    @ExceptionHandler(MethodArgumentNotValidException.class)

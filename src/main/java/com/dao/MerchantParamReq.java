@@ -1,10 +1,7 @@
 package com.dao;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
@@ -13,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class MerchantParamReq extends ParamReqPagination {
     private String name;
     private String location;
-    private int open;
+    private String open;
 }

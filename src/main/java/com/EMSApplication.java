@@ -11,11 +11,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class EMSApplication {
 
     @org.springframework.beans.factory.annotation.Value("${server.port}")
-    private static Integer port;
-    public static void main(String[] args) {
-        SpringApplication.run(EMSApplication.class, args);
+    private Integer port;
 
-        log.info("Server is running on localhost: {}", port);
+    private Integer getPort() {
+        return this.port;
+    }
+    public static void main(String[] args) {
+        EMSApplication emsApplication = SpringApplication.run(EMSApplication.class, args).getBean(EMSApplication.class);
+        log.info("Server is running on http:\\\\localhost:{}", emsApplication.getPort());
     }
 
 }
