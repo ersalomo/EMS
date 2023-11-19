@@ -9,6 +9,7 @@ import com.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
@@ -43,6 +44,17 @@ public class ErrorController {
 
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<NotFoundResponse> apiException(ResponseStatusException e) {
+        log.error("Error {} {}", e.getReason() , e.getMessage());
+        return ResponseEntity.status(e.getStatus()).body(
+                NotFoundResponse.builder()
+                                .message(e.getReason())
+                                .statusCode(e.getStatus().value()
+                                ).build()
+                );
+
+    }
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<NotFoundResponse> notFoundUserAuth(ResponseStatusException e) {
         log.error("Error {} {}", e.getReason() , e.getMessage());
         return ResponseEntity.status(e.getStatus()).body(
                 NotFoundResponse.builder()

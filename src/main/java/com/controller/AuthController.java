@@ -2,15 +2,19 @@ package com.controller;
 
 
 import com.entity.User;
+import com.model.LoginAuthReq;
 import com.model.UserRequest;
 import com.response.SuccessResponse;
 import com.service.AuthService;
 import com.service.UserService;
 import com.service.ValidatorService;
+import com.util.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,11 +34,20 @@ public class AuthController {
     @Autowired
     private ValidatorService validator;
 
+    @Autowired
+    private JwtUtils jwtUtils;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+
+//    @Autowired private ModelMapper
+
     @PostMapping("/login")// token btw
-    public ResponseEntity<SuccessResponse<String>> login(@RequestBody UserRequest req) {
+    public ResponseEntity<SuccessResponse<String>> login(@RequestBody LoginAuthReq req) {
         validator.validate(req);
         boolean isExists = authService.auth(req);
-        if (!isExists){
+        if (!isExists) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                     SuccessResponse.<String>builder()
                             .status("fail")
@@ -58,8 +71,24 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(
                 SuccessResponse.<User>builder()
                         .data(userService.create(req))
-                        .message("Login success").build()
+                        .message("Registered success").build()
         );
+    }
+
+    @PostMapping(value = "/auth")
+    public String generateToken( @RequestBody LoginAuthReq req) throws Exception {
+        validator.validate(req);
+        try {
+//            authenticationManager.authenticate(
+//                    new UsernamePasswordAuthenticationToken(
+//                            req.getEmail(), req.getPassword()
+//                    ));
+
+        } catch (Exception e) {
+            throw new Exception("Invalid");
+        }
+        return jwtUtils.generateToken(req.getEmail());
+
     }
 
 }

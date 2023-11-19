@@ -8,10 +8,15 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    User findByEmail(String email);
+//    User findByEmail(String email);
+
+    Optional<User> findByUsername(String username);
+    Optional<User> findOneByUsername(String username);
 
     @Query("select u from User u")
     Page<User> findAllUser(Pageable pageable);
@@ -20,4 +25,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Page<User> findByUsernameLikeOrEmailLike(String username, String email, Pageable pageable);
 
     boolean existsByEmail(String email);
+    Optional<User> findByEmail(String email);
+
 }
