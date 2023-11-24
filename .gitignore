@@ -33,7 +33,7 @@ build/
 .vscode/
 
 db.sql
-src/main/resources/*
+#src/main/resources/*
 src/test/java/*
 logs/*
 .mvn
