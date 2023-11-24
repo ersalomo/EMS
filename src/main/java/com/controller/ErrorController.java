@@ -1,11 +1,8 @@
 package com.controller;
 
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.response.BadRequestResponse;
 import com.response.NotFoundResponse;
-import com.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,8 +18,6 @@ import java.util.regex.Pattern;
 
 @Slf4j
 @RestControllerAdvice
-//@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-
 public class ErrorController {
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -35,7 +30,7 @@ public class ErrorController {
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(BadRequestResponse.<String>builder()
+                .body(BadRequestResponse.builder()
                         .errors(errors)
                         .build());
 
@@ -54,13 +49,12 @@ public class ErrorController {
 
     }
     @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<NotFoundResponse> notFoundUserAuth(ResponseStatusException e) {
-        log.error("Error {} {}", e.getReason() , e.getMessage());
-        return ResponseEntity.status(e.getStatus()).body(
+    public ResponseEntity<NotFoundResponse> notFoundUserAuth(UsernameNotFoundException e) {
+        log.error("Error {} {}",e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                 NotFoundResponse.builder()
-                                .message(e.getReason())
-                                .statusCode(e.getStatus().value()
-                                ).build()
+                                .message(e.getMessage())
+                                .statusCode(HttpStatus.NOT_FOUND.value()).build()
                 );
 
     }

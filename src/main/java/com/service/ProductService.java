@@ -50,7 +50,7 @@ public class ProductService {
     public Product create(ProductRequest productReq) {
         Merchant merchant = merchantService.findById(productReq.getMerchantId());
         Product product =  new Product();
-        product.setProductCode("product-" + GenerateUniqueCode.generateUniqueCode() + UUID.randomUUID().toString());
+        product.setProductCode("product-" + GenerateUniqueCode.generateUniqueCode() + UUID.randomUUID());
         product.setProductName(productReq.getProductName());
         product.setPrice(productReq.getPrice());
         product.setMerchant(merchant);

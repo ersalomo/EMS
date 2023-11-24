@@ -2,6 +2,8 @@ package com.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import javax.validation.Validator;
@@ -13,4 +15,14 @@ public class ValidatorBean {
     public Validator validator() {
      return new LocalValidatorFactoryBean();
     }
+
+//    @Bean
+//    public JavaMailSenderImpl javaMailSender() {
+//        JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
+////        javaMailSender.setProtocol("smtp.gmail.com");
+//        javaMailSender.setHost("smtp.gmail.com");
+//        javaMailSender.se
+//        javaMailSender.setPort(587);
+//        return  javaMailSender;
+//    }
 }

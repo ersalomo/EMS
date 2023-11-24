@@ -12,6 +12,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import com.util.PasswordEncoder;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -23,6 +25,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private JwtFilter jwtFilter;
+
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -31,15 +36,21 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(
                         "/docs.html",
                         "/my-api/**",
-                        "/auth/register",
-                        "/auth/auth",
-                        "/auth/login",
+                        "/auth/**",
                         "/swagger-ui/**"
                 ).permitAll()
                 .anyRequest()
                 .authenticated()
+//                .and()
+//                .httpBasic()
+                // new added
                 .and()
-                .httpBasic();
+                .exceptionHandling()
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
 
     }
@@ -47,8 +58,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(daoAuthenticationProvider());
-        // after //
-//        auth.userDetailsService(userService);
     }
 
     @Bean

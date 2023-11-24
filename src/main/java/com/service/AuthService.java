@@ -19,7 +19,7 @@ public class AuthService {
     private UserService userservice;
 
     public Boolean auth(LoginAuthReq req) {
-        User user = userservice.getByEmail(req.getEmail());
+        User user = (User) userservice.loadUserByUsername(req.getUsername());
         return user != null && BCrypt.checkpw(req.getPassword(), user.getPassword());
 //        return user.filter(value -> BCrypt.checkpw(req.getPassword(), value.getPassword())).isPresent();
     }

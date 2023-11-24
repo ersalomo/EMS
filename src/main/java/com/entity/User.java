@@ -38,6 +38,8 @@ public class User extends DefaultAttrEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     private RoleUser roleUser;
 
+    private String otp;
+
 
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user")

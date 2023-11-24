@@ -12,12 +12,12 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoginAuthReq {
-//    @Size(min = 8, max = 100)
-//    private String username;
-    @NotBlank
-    private String email;
 
-    @NotBlank
+    @Size(min = 8, max = 100)
+    @NotBlank(message = "username is required")
+    private String username;
+
+    @NotBlank(message = "password is required")
     @Size(min = 8, max = 255)
     private String password;
 }
