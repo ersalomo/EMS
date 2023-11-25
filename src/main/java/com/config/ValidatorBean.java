@@ -16,13 +16,11 @@ public class ValidatorBean {
      return new LocalValidatorFactoryBean();
     }
 
-//    @Bean
-//    public JavaMailSenderImpl javaMailSender() {
-//        JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
-////        javaMailSender.setProtocol("smtp.gmail.com");
-//        javaMailSender.setHost("smtp.gmail.com");
-//        javaMailSender.se
-//        javaMailSender.setPort(587);
-//        return  javaMailSender;
-//    }
+    @Bean
+    public JavaMailSenderImpl javaMailSender() {
+        JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
+        javaMailSender.setHost("smtp.gmail.com");
+        javaMailSender.setPort(587);
+        return  javaMailSender;
+    }
 }
